@@ -16,12 +16,21 @@ def color_pick(height):
         color = 'red'
     return color
 
-fg = folium.FeatureGroup(name='My Map')
+fgv = folium.FeatureGroup(name='Volcanoes')
 
 
 for lt, ln, el in zip(lat,lon,elev):
-    fg.add_child(folium.CircleMarker(location=[lt,ln], radius= 6, popup=(str(el)), fill_color=color_pick(el), color='grey', fill_opacity=0.7, fill=True))
+    fgv.add_child(folium.CircleMarker(location=[lt,ln], radius= 6, popup=(str(el)), fill_color=color_pick(el), color='grey', fill_opacity=0.7, fill=True))
 
-map.add_child(fg)
+fgpop = folium.FeatureGroup(name='Population')
+
+
+fgpop.add_child(folium.GeoJson(data=open('world.json', 'r', encoding='utf-8-sig').read(),
+style_function=lambda x: {'fillColor':'red' if x['properties']['POP2005'] < 100000
+else 'orange' if 1000000 <= x['properties']['POP2005'] < 30000000 else 'green' }))
+
+map.add_child(fgv)
+map.add_child(fgpop)
+map.add_child(folium.LayerControl())
 
 map.save('map1.html')
